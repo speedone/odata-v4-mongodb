@@ -220,7 +220,8 @@ export class Visitor{
 		this.Visit(node.value.left, context);
 		this.Visit(node.value.right, context);
 
-		if (context.identifier) context.query[context.identifier] = context.literal;
+		// using object with $eq instead of just value assigned to identifier we resolve an issue with OData: not (documentStatus eq 'OPEN')
+		if (context.identifier) context.query[context.identifier] = { $eq: context.literal };
 		delete context.identifier;
 		delete context.literal;
 	}
@@ -288,6 +289,12 @@ export class Visitor{
 				case "startswith":
 					context.query[context.identifier] = new RegExp("^" + context.literal, "gi");
 					break;
+				case "tolower":
+					// mongoDb is case insensitive as default, so it should resolve 99% cases I hope - better than exception I think?
+					// $toLower function is implemented only for agregation in MongoDb
+					// using object with $eq instead of just value assigned to identifier we resolve an issue with OData: not (documentStatus eq 'OPEN')
+                    context.query[context.identifier] = { $eq: context.literal };
+                    break;
 				default:
 					throw new Error("Method call not implemented.")
 			}
