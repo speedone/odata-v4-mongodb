@@ -33,6 +33,7 @@ node_modules
 .node_repl_history
 
 .vscode
-lib
+lib/
 report/
 test-results.xml
+/package-lock.json
